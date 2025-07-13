@@ -23,14 +23,19 @@
       e.preventDefault();
       const formData = new FormData(form);
 
-      const res = await fetch('<img src="http://localhost:5000/uploads//api/products/add', {
-        method: 'POST',
-        body: formData
-      });
+      try {
+        const res = await fetch('https://ecommerce-backend-pmeu.onrender.com/api/products/add', {
+          method: 'POST',
+          body: formData
+        });
 
-      const text = await res.text();
-      alert(text);
-      form.reset();
+        const result = await res.text();
+        alert(result);
+        form.reset();
+      } catch (err) {
+        alert("Error uploading product. See console.");
+        console.error(err);
+      }
     });
   </script>
 </body>
