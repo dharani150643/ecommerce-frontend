@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Order History</title>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <h1>Your Order History</h1>
+  <div id="history"></div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert("Please log in to view your orders");
+      window.location.href = "login.html";
+    }
+
+    fetch('<img src="http://localhost:5000/uploads//api/orders/history', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById('history');
+      if (data.length === 0) {
+        container.innerHTML = "<p>No orders found.</p>";
+        return;
+      }
+
+      let lastOrder = null;
+      let html = "";
+      data.forEach((row) => {
+        if (lastOrder !== row.order_id) {
+          if (lastOrder !== null) html += "</ul>";
+          html += `<h3>Order #${row.order_id} - ${new Date(row.created_at).toLocaleString()}</h3><ul>`;
+          lastOrder = row.order_id;
+        }
+        html += `<li>${row.name} - Qty: ${row.quantity} - ₹${row.price}</li>`;
+      });
+      html += "</ul>";
+      container.innerHTML = html;
+    });
+  </script>
+</body>
+</html>

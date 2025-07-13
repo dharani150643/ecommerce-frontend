@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Checkout</title>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <h1>Checkout</h1>
+
+  <form id="checkoutForm">
+    <input type="text" name="fullname" placeholder="Full Name" required />
+    <input type="text" name="address" placeholder="Shipping Address" required />
+    <input type="text" name="city" placeholder="City" required />
+    <input type="text" name="state" placeholder="State" required />
+    <input type="text" name="zip" placeholder="ZIP Code" required />
+    <input type="text" name="phone" placeholder="Phone Number" required />
+    <button type="submit">Place Order</button>
+  </form>
+
+  <script>
+    const form = document.getElementById('checkoutForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert("You must be logged in to place an order.");
+        return window.location.href = "login.html";
+      }
+
+      const formData = new FormData(form);
+      const shipping = {};
+      formData.forEach((val, key) => shipping[key] = val);
+
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      if (cart.length === 0) {
+        alert("Your cart is empty.");
+        return;
+      }
+
+      const orderData = { ...shipping, items: cart };
+
+      try {
+        const res = await fetch('<img src="http://localhost:5000/uploads//api/orders/place', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(orderData)
+        });
+
+        const data = await res.json();
+        alert(data.message);
+        localStorage.removeItem('cart');
+        window.location.href = "products.html";
+      } catch (err) {
+        alert("Something went wrong while placing the order.");
+      }
+    });
+  </script>
+</body>
+</html>

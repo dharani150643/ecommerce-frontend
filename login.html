@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <h1>User Login</h1>
+  <form id="loginForm">
+    <input type="email" name="email" placeholder="Email" required />
+    <input type="password" name="password" placeholder="Password" required />
+    <button type="submit">Login</button>
+  </form>
+
+  <p>Don't have an account? <a href="register.html">Register</a></p>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+
+      try {
+        const res = await fetch('https://ecommerce-backend-pmeu.onrender.com/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+        if (res.ok) {
+          localStorage.setItem('token', result.token);
+          alert("Login successful!");
+          window.location.href = "products.html";
+        } else {
+          alert(result.message || "Login failed.");
+        }
+      } catch {
+        alert("Error logging in.");
+      }
+    });
+  </script>
+</body>
+</html>

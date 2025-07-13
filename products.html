@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Product Catalog</title>
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+  <header>
+    <h1>E-Commerce Product Catalog</h1>
+    <nav>
+      <a href="cart.html">🛒 Cart</a>
+      <a href="admin.html">Admin Panel</a>
+    </nav>
+  </header>
+
+  <section class="product-grid" id="productList">
+    <!-- Products will be dynamically inserted here -->
+  </section>
+
+  <script>
+    // Fetch and display products
+    fetch('https://ecommerce-backend-pmeu.onrender.com/api/products')
+      .then(res => res.json())
+      .then(products => {
+        const list = document.getElementById('productList');
+        products.forEach(p => {
+          list.innerHTML += `
+            <div class="product-card">
+              <img src="<img src="http://localhost:5000/uploads//uploads/${p.image}" alt="${p.name}">
+              <h3>${p.name}</h3>
+              <p>${p.description}</p>
+              <strong>₹${p.price}</strong>
+              <p>In Stock: ${p.stock}</p>
+              <button onclick="addToCart(${p.id}, '${p.name}', ${p.price})">Add to Cart</button>
+            </div>
+          `;
+        });
+      });
+
+    // Add to cart
+    function addToCart(id, name, price) {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const existing = cart.find(item => item.id === id);
+      if (existing) {
+        existing.qty++;
+      } else {
+        cart.push({ id, name, price, qty: 1 });
+      }
+      localStorage.setItem('cart', JSON.stringify(cart));
+      alert(`${name} added to cart`);
+    }
+  </script>
+</body>
+</html>
